@@ -20,9 +20,6 @@ function DownloadFileFromGitHub([string]$githubOrg = '',
                 -Headers @{'accept' = 'application/vnd.github.v3+json'; `
                             'authorization' = "Bearer $gitHubPat"}
 
-    # Decode and write contents (force UTF-8 No BOM)
-    $fileContents = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($gitObject.Content))
-    New-Item -Path $fileDestinationPath -ItemType "file" -Force
-    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-    [System.IO.File]::WriteAllLines($fileDestinationPath, $fileContents, $Utf8NoBomEncoding)
+    # Download contents
+    Invoke-WebRequest -Uri $gitObject.download_url -Headers @{'authorization' = "Bearer $gitHubPat"} -OutFile $fileDestinationPath
 }
